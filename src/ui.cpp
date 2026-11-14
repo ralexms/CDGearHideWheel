@@ -7,7 +7,7 @@
 namespace ghw {
 
 namespace {
-using ItemInfoFn = U64(__fastcall*)(U64, U32);
+using ItemInfoFn = U64(__fastcall*)(const U16* key);
 using LocTextFn = const char*(__fastcall*)(U64, U32);
 ItemInfoFn g_item_info = nullptr;
 VoidFn g_restyle = nullptr; // (class holder*): re-styles an element after its classes changed
@@ -25,7 +25,7 @@ std::string class_name(U32 id)
 const char* item_name_raw(U16 key)
 {
     __try {
-        U64 info = g_item_info(0, key);
+        U64 info = g_item_info(&key);
         if (!info || info == *reinterpret_cast<U64*>(g_base + kRvaDefaultItemInfo)) return nullptr;
         U64 text = *reinterpret_cast<U64*>(info + 0x90); // localized name, vfunc 1 (text, 0) -> UTF-8
         if (!text) return nullptr;

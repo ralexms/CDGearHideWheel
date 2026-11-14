@@ -38,7 +38,7 @@ constexpr U64 kUserMax = 0x00007FFFFFFEFFFFull;
 constexpr U64 kVfUiMgr = 0x118; // any UI script's vfunc returning the UI manager (toasts)
 
 // --- Game function signatures (as Outfit Manager uses them) ----------------------------------------
-using RecordGetFn = U64(__fastcall*)(U64, U32);
+using RecordGetFn = U64(__fastcall*)(const U16* key); // the game's table getters by key (u32 by value before 1.0.0.3663)
 using VoidFn = void(__fastcall*)(U64);
 using SetTextFn = void(__fastcall*)(U64, const char*, U64);
 using FloatFn = float(__fastcall*)(U64);
@@ -94,7 +94,7 @@ constexpr U16 kKliff = 0, kDamiane = 3, kOongka = 5;
 const char* character_name(U16 key);
 
 // --- Equipment slots ("equipment-N") ----------------------------------------------------------------
-constexpr U16 kSlotHat = 3, kSlotChest = 4, kSlotCloak = 16, kBackShieldSlot = 23;
+constexpr U16 kSlotHat = 3, kSlotChest = 4, kSlotCloak = 16, kSlotBag = 19, kBackShieldSlot = 23;
 constexpr U16 kHandR = 0, kHandL = 1, kBowSlot = 2;
 constexpr U16 kWeaponRecord = 0, kArmorRecord = 1; // QuickSlotInfo records = the gear wheel's tabs
 constexpr U32 kRecSlotCount = 0x0c, kRecSlots = 0x18, kSlotSize = 0x50, kSlotEquipIdx = 0x20;

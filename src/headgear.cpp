@@ -1,12 +1,14 @@
 // Per-character headgear mode, through the game's own headgear option (see headgear.h).
 //
-// Found in CrimsonDesert.exe 1.0.0.3576 (Steam build 26480954): the option byte is read by
-//   +A856B0 (inv, ?, u8, u8 event)  the headgear decision; ends in the headgear switch (+A87F90, Outfit Manager's BattleVis)
-//   +A85A20 (inv)                   re-runs the decision (the game calls it when the option changes)
-//   +A85AF0 (inv, hat item)         a helper both of the above call
-//   +A88980 (inv, ...)              the battle-state loop: re-decides when the option is "shown in combat"
-//   +A9E3E0 (inv, ...)              another consumer of the option
-// Each reads the byte with a rip-relative load; all five point at the same global.
+// Found in CrimsonDesert.exe 1.0.0.3663 (exe 0x6af5d198; 1.0.0.3576, Steam build 26480954, in brackets):
+// the option byte (+71FA878) is read by
+//   +ABAF00 (inv, ?, u8, u8 event)  the headgear decision; ends in the headgear switch (+ABD840, Outfit Manager's
+//                                   BattleVis) [+A856B0]
+//   +ABB270 (inv)                   re-runs the decision (the game calls it when the option changes) [+A85A20]
+//   +ABB350 (inv, hat item)         a helper both of the above call [+A85AF0]
+//   +ABE240 (inv, ...)              the battle-state loop: re-decides when the option is "shown in combat" [+A88980]
+//   +AD3F60 (inv, ...)              another consumer of the option [+A9E3E0]
+// Each reads the byte with a rip-relative load; all five point at the same global (the refresh only through the others).
 #include "common.h"
 #include "headgear.h"
 #include "gear.h"
@@ -32,16 +34,19 @@ struct Reader {
 };
 
 Reader g_readers[] = {
-    {"decide", 0xa856b0, "48 89 5C 24 10 48 89 6C 24 18 56 57 41 54 41 56 41 57 48 83 EC 30 41 0F B6 F1 45 0F B6 F0",
-     0xac, "0F B6 2D"},
-    {"refresh", 0xa85a20, "48 89 5C 24 18 57 48 83 EC 20 48 8B F9 48 8B 41 08 48 8B 50 68 48 8B 42", 0, nullptr},
-    {"helper", 0xa85af0, "48 89 6C 24 18 48 89 7C 24 20 41 56 48 83 EC 20 48 8B 41 08 48 8B EA 48", 0x85, "0F B6 15"},
-    {"battle loop", 0xa88980,
-     "48 89 5C 24 08 44 89 4C 24 20 4C 89 44 24 18 48 89 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 60 E8 FF FF B8 A0 18 00 00",
-     0xe18, "80 3D"},
-    {"consumer", 0xa9e3e0,
-     "48 8B C4 4C 89 48 20 66 44 89 40 18 48 89 50 10 48 89 48 08 55 53 56 57 41 54 41 55 41 56 41 57 48 8D A8 D8 FD FF FF 48 81 EC E8 02 00 00",
-     0xee7, "0F B6 3D"},
+    {"decide", 0xabaf00, "48 89 5C 24 10 48 89 6C 24 18 56 57 41 54 41 56 41 57 48 83 EC 30 41 0F B6 F1 45 0F B6 F0",
+     0xb7, "0F B6 2D"},
+    {"refresh", 0xabb270,
+     "48 89 5C 24 18 57 48 83 EC 20 48 8B F9 48 8B 41 08 48 8B 50 68 48 8B 4A 20 48 83 C1 30 E8 ?? ?? ?? ?? 0F B7 80",
+     0, nullptr},
+    {"helper", 0xabb350,
+     "40 55 57 41 56 48 83 EC 20 48 8B 41 08 48 8B F9 48 8B EA 4C 8B 40 68 49 8B 48 20 48 83 C1 30 E8", 0x88, "0F B6 15"},
+    {"battle loop", 0xabe240,
+     "48 89 5C 24 08 4C 89 44 24 18 48 89 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 60 E8 FF FF B8 A0 18 00 00",
+     0xe6b, "80 3D"},
+    {"consumer", 0xad3f60,
+     "48 8B C4 4C 89 48 20 66 44 89 40 18 48 89 50 10 48 89 48 08 55 53 56 57 41 54 41 55 41 56 41 57 48 8D A8 C8 FD FF FF 48 81 EC F8 02 00 00",
+     0xf1a, "0F B6 3D"},
 };
 
 U64 g_option = 0;  // address of the game's option byte (0: not found)

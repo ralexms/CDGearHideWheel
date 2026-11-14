@@ -9,7 +9,7 @@ namespace ghw {
 
 // --- Game addresses (CrimsonDesert 1.0.0.2976) ---------------------------------------------------
 U64 kRvaRootQuickSlotVt = 0x5a7cfc8;
-U64 kRvaQuickSlotInfoGet = 0x120f110;  // record* (unused, u32 key)
+U64 kRvaQuickSlotInfoGet = 0x12489b0;  // record* (const u16* key) (1.0.0.3663; was (unused, u32 key))
 U64 kRvaStringInfoGet = 0x3de0c0;      // stringinfo* (unused, u32 id); +0x10 -> char**
 U64 kRvaQuickSlotInfoMgr = 0x71dcbf0;  // ptr; +8 count, +0x58 record pointers
 U64 kRvaClassNames = 0x70dbee0;        // ptr; +0x58 -> {char* name, ...}[id] (stride 0x10)
@@ -261,8 +261,9 @@ U64 kOffItemPassives = 0x118; // -> {entries*, count} (null when none: the game'
 U64 kOffItemStats = 0x188;    // -> {rows*, count}; a row's base stats at +0x58 / +0x60
 
 // --- Item names: the game's item info table (as its own item-name text does) ---
-U64 kRvaItemInfo = 0x3dd8a0;        // (unused, u32 key) -> item info; unknown keys -> the default info
-U64 kRvaDefaultItemInfo = 0x7151fc8; // pointer to that default info
+U64 kRvaItemInfo = 0x3daf10;        // (const u16* key) -> item info; unknown keys -> the default info (1.0.0.3663;
+                                    // was (unused, u32 key))
+U64 kRvaDefaultItemInfo = 0x71d6d68; // pointer to that default info
 
 // --- Setup --------------------------------------------------------------------------------------
 // Game addresses come from the resolver (resolver.h): cached for this exe, else the known build's, else searched.

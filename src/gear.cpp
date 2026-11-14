@@ -106,7 +106,8 @@ std::atomic<bool> g_collected{false};
 U64 record(U32 key)
 {
     __try {
-        return g_qsi_get(0, key);
+        const U16 k = static_cast<U16>(key);
+        return g_qsi_get(&k);
     } __except (EXCEPTION_EXECUTE_HANDLER) {
         return 0;
     }

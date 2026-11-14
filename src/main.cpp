@@ -17,7 +17,7 @@ U64 g_base = 0;
 HMODULE g_self = nullptr;
 std::wstring g_dir;
 
-constexpr const char* kVersion = "0.5.0";
+constexpr const char* kVersion = "0.6.3";
 
 namespace {
 

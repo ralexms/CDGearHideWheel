@@ -2,12 +2,12 @@
 // Known build: exe timestamp 0x6aed2e85, code 0x1000+0x5596000. 145 addresses.
 // Included inside outfit_manager.cpp's namespace, after the kRva* variables.
 
+// (hand-edited for 1.0.0.3663, exe 0x6af5d198: the key getters take a const u16* key now)
 constexpr resolver::Alt kAlts_kRvaItemInfo[] = {
-    {resolver::AltKind::Ref, "49 39 77 10 0F 8E ?? ?? ?? ?? 8B D0 E8 ?? ?? ?? ??", 12, 1, 5, -1, 0, 0xa8e12a},
-    {resolver::AltKind::Ref, "75 04 0F B7 43 08 0F B7 D0 E8 ?? ?? ?? ?? 49 8B 4D 68", 9, 1, 5, -1, 0, 0xa91a38},
-    {resolver::AltKind::Ref, "E8 ?? ?? ?? ?? 8B 58 08 0F B7 D5 E8 ?? ?? ?? ??", 11, 1, 5, -1, 0, 0xa97fad},
-    {resolver::AltKind::Ref, "4C 89 75 30 89 7D E8 8B D7 E8 ?? ?? ?? ??", 9, 1, 5, -1, 0, 0xacc33e},
-    {resolver::AltKind::Ref, "48 83 BA B8 00 00 00 00 74 1B 0F B7 52 08 E8 ?? ?? ?? ??", 14, 1, 5, -1, 0, 0xe01d2a},
+    {resolver::AltKind::Ref, "E8 ?? ?? ?? ?? 8B 58 08 48 8D 4C 24 60 E8 ?? ?? ?? ??", 13, 1, 5, -1, 0, 0xacdb24},
+    {resolver::AltKind::Ref, "48 8D 8D 38 05 00 00 E8 ?? ?? ?? ?? 0F B7 50 54 66 89 95 48 05 00 00", 7, 1, 5, -1, 0, 0xac2d95},
+    {resolver::AltKind::Ref, "48 8D 4D 30 E8 ?? ?? ?? ?? 44 8B 40 74 45 85 C0", 4, 1, 5, -1, 0, 0xac32e3},
+    {resolver::AltKind::Ref, "48 8D 4D 30 E8 ?? ?? ?? ?? B9 FF FF 00 00 66 39 48 4C", 4, 1, 5, -1, 0, 0xac32f5},
 };
 constexpr resolver::Alt kAlts_kRvaStringInfoGet[] = {
     {resolver::AltKind::Ref, "48 8B 05 ?? ?? ?? ?? 48 8B 98 D8 00 00 00 0F B7 17 E8 ?? ?? ?? ?? 48 8D 50 10 48 8B 43 08 48 8B 88 C0 02 00 00 48 8B 89 68 00 04 00 48 83 C1 50 E8 ?? ?? ?? ?? 48 85 C0 75 05 49 8B C6", 17, 1, 5, -1, 0, 0xa98001},
@@ -217,7 +217,8 @@ constexpr resolver::Alt kAlts_kRvaFocusedSlot[] = {
     {resolver::AltKind::Ref, "4C 8B 4F 28 41 0F B6 91 8D 02 00 00 49 8B C9 E8 ?? ?? ?? ??", 15, 1, 5, -1, 0, 0x10b7e55},
 };
 constexpr resolver::Alt kAlts_kRvaQuickSlotInfoGet[] = {
-    {resolver::AltKind::Ref, "0F B7 F0 89 B5 F8 00 00 00 8B D6 E8 ?? ?? ?? ??", 11, 1, 5, -1, 0, 0x120be0f},
+    {resolver::AltKind::Ref, "66 89 85 E0 00 00 00 48 8D 8D E0 00 00 00 E8 ?? ?? ?? ?? 44 8B 78 0C", 14, 1, 5, -1, 0, 0x124591d},
+    {resolver::AltKind::Ref, "48 8D 8D E0 00 00 00 E8 ?? ?? ?? ?? 41 8B CE 48 8D 34 89", 7, 1, 5, -1, 0, 0x1245af7},
 };
 constexpr resolver::Alt kAlts_kRvaIntern[] = {
     {resolver::AltKind::Ref, "41 B8 01 00 00 00 48 8D 15 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 90 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 05 ?? ?? ?? ?? 89 44 24 48 C5 FA 10 05 ?? ?? ?? ??", 20, 1, 5, -1, 0, 0x55f9ec},
@@ -560,7 +561,7 @@ constexpr resolver::Alt kAlts_kRvaEmptyItem[] = {
     {resolver::AltKind::Ref, "48 8B CF E8 ?? ?? ?? ?? 4C 8B F0 48 39 05 ?? ?? ?? ?? 0F 84 ?? ?? ?? ?? 0F B7 40 08", 11, 3, 7, -1, 0, 0xacc412},
 };
 constexpr resolver::Alt kAlts_kRvaDefaultItemInfo[] = {
-    {resolver::AltKind::Within, "48 8B 0D ?? ?? ?? ?? 85 C0 74 05 48 8B C1", 0, 3, 7, 0, 0, 0x3dd9dd},
+    {resolver::AltKind::Within, "48 8B 05 ?? ?? ?? ?? 48 83 C4 28 C3", 0, 3, 7, 0, 0, 0x3daf25},
 };
 constexpr resolver::Alt kAlts_kRvaPermId[] = {
     {resolver::AltKind::Ref, "8B 05 ?? ?? ?? ?? 89 44 24 58 C7 44 24 60 00 00 00 00", 0, 2, 6, -1, 0, 0x557f99},
@@ -617,7 +618,7 @@ constexpr resolver::Alt kAlts_kRvaQuickSlotInfoMgr[] = {
 };
 
 constexpr resolver::Recipe kRecipes[] = {
-    {"kRvaItemInfo", resolver::Kind::Func, 0x3dd8a0, nullptr, nullptr, -1, 0, kAlts_kRvaItemInfo, 5, "4C 8B DC 49 89 5B 08 49 89 6B 18 56 57 41 56 48 83 EC 60"},
+    {"kRvaItemInfo", resolver::Kind::Func, 0x3daf10, nullptr, nullptr, -1, 0, kAlts_kRvaItemInfo, 4, "48 83 EC 28 44 0F B7 01 48 8B 0D ?? ?? ?? ?? 44 3B 41 28 72 0C 48 8B 05"},
     {"kRvaStringInfoGet", resolver::Kind::Func, 0x3de0c0, nullptr, nullptr, -1, 0, kAlts_kRvaStringInfoGet, 5, "4C 8B DC 49 89 5B 08 49 89 6B 18 56 57 41 56 48 83 EC 60"},
     {"kRvaStrDestroy", resolver::Kind::Func, 0x3e5fc0, nullptr, nullptr, -1, 0, kAlts_kRvaStrDestroy, 5, "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 20 48 8B F9 48 8B 19 48 8D 35 ?? ?? ?? ?? 48 3B DE"},
     {"kRvaStrAssign", resolver::Kind::Func, 0x445f60, "40 53 55 56 48 83 EC 30 48 8B 31 48 8B EA 48 8B D9 48 3B 16 0F 84 ?? ?? ?? ?? 4C 89 64 24 60 4C 8D 25 ?? ?? ?? ?? 4C 89 74 24 28 49 C7 C6 FF FF FF FF 4C 89 7C 24 20 48 85 D2 74 40", nullptr, -1, 0, kAlts_kRvaStrAssign, 5, nullptr},
@@ -685,7 +686,7 @@ constexpr resolver::Recipe kRecipes[] = {
     {"kRvaGearMode", resolver::Kind::Func, 0x120c6e0, "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 20 48 8B B1 80 01 00 00", nullptr, -1, 0, kAlts_kRvaGearMode, 2, nullptr},
     {"kRvaDepthMode", resolver::Kind::Func, 0x120cc80, "40 ?? 48 83 EC 20 48 8B ?? 3A 91 8D 02 00 00", nullptr, -1, 0, kAlts_kRvaDepthMode, 4, nullptr},
     {"kRvaFocusedSlot", resolver::Kind::Thunk, 0x120e690, nullptr, nullptr, -1, 0, kAlts_kRvaFocusedSlot, 5, nullptr},
-    {"kRvaQuickSlotInfoGet", resolver::Kind::Func, 0x120f110, nullptr, nullptr, -1, 0, kAlts_kRvaQuickSlotInfoGet, 1, "4C 8B DC 49 89 5B 08 49 89 6B 18 56 57 41 56 48 83 EC 60"},
+    {"kRvaQuickSlotInfoGet", resolver::Kind::Func, 0x12489b0, nullptr, nullptr, -1, 0, kAlts_kRvaQuickSlotInfoGet, 2, "48 83 EC 28 44 0F B7 01 48 8B 0D ?? ?? ?? ?? 44 3B 41 28 72 0C 48 8B 05"},
     {"kRvaHudInput", resolver::Kind::Func, 0x12474d0, "48 89 5C 24 08 48 89 74 24 18 48 89 7C 24 20 55 41 54 41 55 41 56 41 57 48 8D AC 24 60 FF FF FF 48 81 EC A0 01 00 00 45 0F B6 F1", nullptr, 122, 115, nullptr, 0, nullptr},
     {"kRvaIntern", resolver::Kind::Func, 0x149f960, "48 89 5C 24 20 44 89 44 24 18 48 89 54 24 10 48 89 4C 24 08 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 D9", nullptr, -1, 0, kAlts_kRvaIntern, 5, nullptr},
     {"kRvaNameId", resolver::Kind::Func, 0x149f960, "48 89 5C 24 20 44 89 44 24 18 48 89 54 24 10 48 89 4C 24 08 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 D9", nullptr, -1, 0, kAlts_kRvaNameId, 5, nullptr},
@@ -752,7 +753,7 @@ constexpr resolver::Recipe kRecipes[] = {
     {"kRvaStateHide", resolver::Kind::Data, 0x711d0b8, nullptr, nullptr, -1, 0, kAlts_kRvaStateHide, 5, nullptr},
     {"kRvaMeshColourArg", resolver::Kind::Data, 0x712a278, nullptr, nullptr, -1, 0, kAlts_kRvaMeshColourArg, 5, nullptr},
     {"kRvaEmptyItem", resolver::Kind::Data, 0x7151298, nullptr, nullptr, -1, 0, kAlts_kRvaEmptyItem, 5, nullptr},
-    {"kRvaDefaultItemInfo", resolver::Kind::Data, 0x7151fc8, nullptr, nullptr, -1, 0, kAlts_kRvaDefaultItemInfo, 1, nullptr},
+    {"kRvaDefaultItemInfo", resolver::Kind::Data, 0x71d6d68, nullptr, nullptr, -1, 0, kAlts_kRvaDefaultItemInfo, 1, nullptr},
     {"kRvaPermId", resolver::Kind::Data, 0x71521b8, nullptr, nullptr, -1, 0, kAlts_kRvaPermId, 3, nullptr},
     {"kRvaIconScriptFlag", resolver::Kind::Data, 0x717f4c8, nullptr, nullptr, -1, 0, kAlts_kRvaIconScriptFlag, 5, nullptr},
     {"kRvaPlayerHolder", resolver::Kind::Data, 0x71c0158, nullptr, nullptr, -1, 0, kAlts_kRvaPlayerHolder, 5, nullptr},

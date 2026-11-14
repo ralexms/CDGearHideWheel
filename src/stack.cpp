@@ -1,11 +1,12 @@
 // The back equipment stack: a hidden cape no longer pushes the weapons on the back outward (see stack.h and
 // docs/cape-offset-research.md).
 //
-// CrimsonDesert.exe 1.0.0.3576:
-//   +2F2A410 (model, SocketBoneData**)  builds the model's stacks from the socket data's StackEquipInfo records
+// CrimsonDesert.exe 1.0.0.3663 (exe 0x6af5d198; 1.0.0.3576, Steam build 26480954, in brackets):
+//   +2F924F0 (model, SocketBoneData**)  builds the model's stacks from the socket data's StackEquipInfo records
 //                                       (vector at +0x48, count +0x50; 0x40-byte records, inner part ids +0x08 / +0x10)
-//   +E79C110 (model)                    the game's own caller: finds the model's socket data, checks it is loaded,
-//                                       builds the stacks, then applies them (+2F2A840)
+//                                       [+2F2A410]
+//   +EE0C420 (model)                    the game's own caller: finds the model's socket data, checks it is loaded,
+//                                       builds the stacks, then applies them (+2F92920) [+E79C110, +2F2A840]
 // The builder only reads the record vector of the socket data it is handed, so for a hidden cape it is handed a copy
 // of the records with the Cloak part left out of their inner parts: the stack is then sized by the chest piece alone.
 #include "common.h"
@@ -23,11 +24,12 @@ namespace {
 using BuildFn = U64(__fastcall*)(U64 model, U64 socket_data_slot);
 using RebuildFn = U64(__fastcall*)(U64 model);
 
-constexpr U64 kRvaBuild = 0x2f2a410, kRvaRebuild = 0xe79c110;
+constexpr U64 kRvaBuild = 0x2f924f0, kRvaRebuild = 0xee0c420;
 constexpr const char* kBuildPattern =
     "48 89 4C 24 08 53 56 41 55 41 56 48 83 EC 78 4C 8B 32 4C 8D 69 20 49 83 C6 48 48 8B F1"; // (add r14, 0x48: the records)
+// (the caller sits in the protected code: the patch re-encoded it, "mov ecx, 0x78" was "mov ecx, [rip+x]; sub ecx, -0x68")
 constexpr const char* kRebuildPattern =
-    "40 53 48 83 EC 20 48 8B 41 50 48 89 CB 8B 0D ?? ?? ?? ?? 81 E9 98 FF FF FF 48 8B 50 08 48 85 D2";
+    "40 53 48 83 EC 20 48 8B 41 50 48 89 CB B9 78 00 00 00 48 8B 50 08 48 85 D2";
 constexpr U64 kOffRecords = 0x48, kOffRecordCount = 0x50, kRecordSize = 0x40;
 constexpr U64 kOffRecInner = 0x08, kOffRecInnerCount = 0x10, kOffRecInnerCap = 0x14;
 
@@ -144,17 +146,19 @@ U64 __fastcall build_hook(U64 model, U64 slot)
     const bool ok = want && sbd && g_cloak_id && make_filtered(sbd, f, removed);
     U64 fake = ok ? reinterpret_cast<U64>(f.obj.data()) : 0;
     U64 r = ok ? call_build(model, reinterpret_cast<U64>(&fake)) : g_build_orig(model, slot);
+    bool news = false; // (ours: logged when the outcome changes - the game builds a model's stacks on every rebuild)
     if (!protagonist(ch)) { // (NPCs, and ours before the mod knows the model: stack_note takes those up)
         std::lock_guard<std::mutex> lock(g_mu);
         if (!g_models.empty()) g_models.erase(model); // (an address reused by another model)
     } else {
         std::lock_guard<std::mutex> lock(g_mu);
         ModelInfo& m = g_models[model];
+        news = !m.built || m.filtered != ok;
         m.built = true, m.filtered = ok, m.pending = false, m.ch = ch;
         m.failed = want && !ok, m.stuck = 0, ++m.builds;
         m.keep = std::move(f); // (the previous copy goes only now: the stacks just built replaced what used it)
     }
-    if (ok || g_cfg.verbose || g_logged.fetch_add(1) < 12) {
+    if (news || g_cfg.verbose || g_logged.fetch_add(1) < 12) {
         const char* nm = character_name(ch);
         LOG("cape stack: built for model %llX (%s) on thread %lu: %s", model, nm ? nm : "not ours / not known yet",
             GetCurrentThreadId(),

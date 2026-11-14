@@ -147,6 +147,10 @@ std::string caption_for(const Target& t, U16 ch, U64 inv)
         int m = state_headgear(ch);
         s += (m >= 0 ? std::string(headgear_mode_text(m)) : std::string("Game setting: ") + headgear_mode_text(game_headgear_option())) +
              key_hint(g_cfg.toggle);
+    } else if (t.slot == kSlotBag && !g_cfg.secondary.empty()) { // (the worn kind first)
+        std::string mob = std::string("Mobility packs: ") + pack_mode_text(state_pack(ch)) + key_hint(g_cfg.secondary);
+        std::string ut = state_part("Utility packs", state_hidden(ch, t.slot), g_cfg.toggle);
+        s += vis_slot_mobility(inv, t.slot) ? mob + "  |  " + ut : ut + "  |  " + mob;
     } else if (shield_slot(inv, t.slot) && !g_cfg.secondary.empty()) {
         std::string sh = std::string("Shield: ") + shield_mode_text(state_shield(ch)) + key_hint(g_cfg.secondary);
         std::string we = state_part("Weapon", state_hidden(ch, t.slot), g_cfg.toggle);
@@ -217,13 +221,22 @@ void press(U64 self, bool toggle, bool secondary)
     } else if (toggle) {
         bool hidden = !state_hidden(ch, t.slot);
         state_set_hidden(ch, t.slot, hidden);
-        // (on a slot holding a shield, the toggle covers the slot's other weapons: say so)
-        add((shield_now ? std::string("Weapons in this slot (not shields)") : piece_name(inv, t.slot)) + (hidden ? ": hidden" : ": shown"));
+        // (on a slot holding a shield, the toggle covers the slot's other weapons; on the backpack slot holding a
+        // mobility pack, the utility packs: say so)
+        add((shield_now                                                ? std::string("Weapons in this slot (not shields)")
+             : t.slot == kSlotBag && vis_slot_mobility(inv, t.slot) ? std::string("Utility packs")
+                                                                     : piece_name(inv, t.slot)) +
+            (hidden ? ": hidden" : ": shown"));
     }
     if (secondary && t.slot == kSlotChest) {
         bool hidden = !state_underwear(ch);
         state_set_underwear(ch, hidden);
         add(hidden ? "Underwear: hidden" : "Underwear: shown");
+    } else if (secondary && t.slot == kSlotBag) { // (mobility packs: Shown -> Hidden -> Shown when in use -> Shown)
+        int next = (state_pack(ch) + 1) % kPackModeCount;
+        state_set_pack(ch, next);
+        add((vis_slot_mobility(inv, t.slot) ? piece_name(inv, t.slot) : std::string("Mobility packs")) + ": " +
+            pack_mode_text(next));
     } else if (secondary && weapon) { // (Shown -> Hidden -> Shown when equipped -> Shown)
         int next = (state_shield(ch) + 1) % kShieldModeCount;
         state_set_shield(ch, next);

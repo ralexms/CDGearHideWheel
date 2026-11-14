@@ -53,13 +53,14 @@ const char* mode_key(int m)
 }
 
 const char* shield_key(int m) { return m == kShieldHidden ? "Hidden" : m == kShieldInHand ? "InHand" : "Shown"; }
+const char* pack_key(int m) { return m == kPackHidden ? "Hidden" : m == kPackInUse ? "InUse" : "Shown"; }
 
 // (g_mu held)
 void save_locked()
 {
     std::string out = "; Gear Hide Wheel: what each character hides (written by the mod; safe to edit with the game closed).\n"
                       "; Hidden = equipment slot numbers, Shields = Shown, Hidden or InHand, Underwear = hidden / shown,\n"
-                      "; Headgear = Game, Shown, Hidden, Combat or Cutscenes\n";
+                      "; Headgear = Game, Shown, Hidden, Combat or Cutscenes, MobilityPack = Shown, Hidden or InUse\n";
     auto list = [](const std::set<U16>& v) {
         std::string s;
         for (U16 slot : v) s += (s.empty() ? " " : ", ") + std::to_string(slot);
@@ -67,7 +68,8 @@ void save_locked()
     };
     for (const auto& [ch, s] : g_state)
         out += "\n[" + section_name(ch) + "]\nHidden =" + list(s.hidden) + "\nShields = " + shield_key(s.shield) +
-               "\nUnderwear = " + (s.underwear ? "hidden" : "shown") + "\nHeadgear = " + mode_key(s.headgear) + "\n";
+               "\nUnderwear = " + (s.underwear ? "hidden" : "shown") + "\nHeadgear = " + mode_key(s.headgear) +
+               "\nMobilityPack = " + pack_key(s.pack) + "\n";
     std::wstring tmp = path() + L".tmp";
     FILE* f = _wfopen(tmp.c_str(), L"wb");
     if (!f) {
@@ -93,6 +95,7 @@ void load_state()
     std::lock_guard<std::mutex> lock(g_mu);
     g_state.clear();
     U16 ch = kNoCharacter;
+    std::set<U16> pack_set; // (characters whose file says MobilityPack: before 0.6 the backpack slot covered every pack)
     for (size_t a = 0; a < text.size();) {
         size_t b = text.find('\n', a);
         std::string line = trim(text.substr(a, b == std::string::npos ? std::string::npos : b - a));
@@ -122,8 +125,13 @@ void load_state()
             s.underwear = v == "hidden";
         } else if (k == "Headgear") {
             s.headgear = headgear_mode_from_name(v); // ("Game": -1)
+        } else if (k == "MobilityPack") {
+            s.pack = v == "Hidden" ? kPackHidden : v == "InUse" ? kPackInUse : kPackShown;
+            pack_set.insert(ch);
         }
     }
+    for (auto& [c, s] : g_state) // (an older file: a hidden backpack slot went for the rocket pack too)
+        if (!pack_set.count(c) && s.hidden.count(kSlotBag)) s.pack = kPackHidden;
     std::string log;
     for (const auto& [c, s] : g_state) {
         publish_head(c, s.headgear);
@@ -161,7 +169,26 @@ bool state_any(U16 ch)
     std::lock_guard<std::mutex> lock(g_mu);
     auto it = g_state.find(ch);
     return it != g_state.end() && (!it->second.hidden.empty() || it->second.shield != kShieldShown || it->second.underwear ||
-                                   it->second.headgear >= 0);
+                                   it->second.headgear >= 0 || it->second.pack != kPackShown);
+}
+
+const char* pack_mode_text(int mode)
+{
+    return mode == kPackHidden ? "Hidden" : mode == kPackInUse ? "Shown when in use" : "Shown";
+}
+
+int state_pack(U16 ch)
+{
+    std::lock_guard<std::mutex> lock(g_mu);
+    auto it = g_state.find(ch);
+    return it == g_state.end() ? kPackShown : it->second.pack;
+}
+
+void state_set_pack(U16 ch, int mode)
+{
+    std::lock_guard<std::mutex> lock(g_mu);
+    g_state[ch].pack = mode;
+    save_locked();
 }
 
 const char* shield_mode_text(int mode)

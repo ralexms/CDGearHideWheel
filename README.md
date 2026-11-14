@@ -3,7 +3,7 @@
 Hide or show each piece of gear right from the game's own gear wheel, separately for Kliff, Damiane and Oongka.
 No key combinations in play: open the gear wheel, highlight a piece, press one key.
 
-Status: **0.5.0.** It is built for Crimson Desert 1.0.0.3576 (Steam build 26480954).
+Status: **0.6.3.** It is built for Crimson Desert 1.0.0.3663.
 
 ## What it does
 
@@ -26,6 +26,10 @@ Status: **0.5.0.** It is built for Crimson Desert 1.0.0.3576 (Steam build 264809
     character's shield mode: *Shown → Hidden → Shown when equipped*. "Shown when equipped" shows the shield in the
     off hand and hides it on the back while a sword or another weapon takes the off hand. The toggle key covers only
     the other weapons in that slot, so you can hide the shield and keep the off-hand sword visible.
+  - **Mobility packs:** with the Backpack slot highlighted, it cycles that character's mode for packs they move with
+    (Oongka's Kuku Rocket Pack): *Shown → Hidden → Shown when in use*. "Shown when in use" hides the pack and shows it
+    while flying (from take-off, when the game puts on the flight goggles, to landing). The toggle key covers the
+    other packs (Disruptor, Explorer's Breathing Device), so each kind keeps its own setting when you switch packs.
 - **Weapons.** A hidden weapon still appears in your hand when you draw it. Its scabbard stays hidden, including the
   two-handed sword's sheath on the back (`TwoHandWeapon_Sword_IN`). A hidden bow hides its quiver and arrows.
 - **Tools.** The game normally shows tools (broom, pickaxe, shovel...) only in your hand. The mod also shows them on
@@ -40,7 +44,7 @@ Status: **0.5.0.** It is built for Crimson Desert 1.0.0.3576 (Steam build 264809
 
 ## Install
 
-**With DMM:** drop `GearHideWheel-0.5.0.zip` onto DMM (or Import it), enable `GearHideWheel` on the ASI Mods page,
+**With DMM:** drop `GearHideWheel-0.6.3.zip` onto DMM (or Import it), enable `GearHideWheel` on the ASI Mods page,
 then Mount Mods. DMM puts the `.asi` and `.ini` in `bin64`, and the mod writes its `.state` file there too.
 - Your choices live in `bin64\GearHideWheel.state`. Back it up before you uninstall or replace the mod in DMM.
 - Re-importing the zip may reset `GearHideWheel.ini` to the defaults. Keep a copy if you changed your keys.
@@ -49,7 +53,7 @@ then Mount Mods. DMM puts the `.asi` and `.ini` in `bin64`, and the mod writes i
 `GearHideWheel.asi` and `GearHideWheel.ini` into `bin64`.
 
 Then start the game. `GearHideWheel.log` appears beside the `.asi`. Its last start-up line should read
-   `ready: hiding on, per-character headgear on, gear wheel on`.
+   `ready: hiding on, per-character headgear on, cape offset fix on, gear wheel on`.
 
 **Gear Hider (mod 554):** this mod replaces it. If you keep both, anything either one hides stays hidden, and both
 compete for the same "weapon drawn" hook. Remove `CrimsonDesertEquipHide.asi` (and its `.ini`) from `bin64`, or move
@@ -63,7 +67,7 @@ To uninstall, delete `GearHideWheel.asi`. Nothing in your saves is changed: hidd
 ```ini
 [Keys]
 Toggle = H, Gamepad_Y           ; hide / show the highlighted piece (cycles the mode on Headgear)
-Secondary = U, Gamepad_X        ; underwear (Chest slot) / shields (weapon slots); "Underwear =" from 0.1.0 still works
+Secondary = U, Gamepad_X        ; underwear (Chest) / shields (weapon slots) / mobility packs (Backpack); "Underwear =" from 0.1.0 still works
 
 [Options]
 ShowPrompt = true               ; state + key on the item name in the wheel's centre panel
@@ -87,7 +91,7 @@ Pick buttons the gear wheel itself doesn't use: the mod sees the press, and so d
 
 Please check these, and send `GearHideWheel.log` (with `Verbose = true`) if something is off:
 
-1. **Start-up.** The log ends with `ready: hiding on, per-character headgear on, gear wheel on`. The `headgear:`
+1. **Start-up.** The log ends with `ready: hiding on, per-character headgear on, cape offset fix on, gear wheel on`. The `headgear:`
    line names the option's value. With your menu set to *Always shown* it should say `is 0 (Always shown)`. If it
    shows a different number, the mode names are mapped in the wrong order, so tell me the number.
 2. **Prompt.** Open the gear wheel and highlight a cloak: the centre panel's name reads `<cloak> - Shown [H]`.
@@ -100,6 +104,8 @@ Please check these, and send `GearHideWheel.log` (with `Verbose = true`) if some
 6. **Underwear.** Highlight the chest and press `U`.
 7. **Shields.** Highlight the off-hand slot: the name shows `Weapon: ... [H] | Shield: ... [U]`. Press `U` to cycle
    the shield mode. On *Shown when equipped*, put a sword in the off hand: the shield disappears from the back.
+   **Mobility packs.** As Oongka with the rocket pack, highlight the Backpack slot and press `U` until *Shown when in
+   use*: the pack is gone, and appears while flying. Switch to a utility pack: it follows the `H` setting instead.
 8. **Per character.** Switch to Damiane: her own choices apply, and Kliff's stay his.
 9. **Persistence.** Quit, start the game and load a save: everything is hidden as before.
 10. **Outfit Manager** (if installed): its Outfits tab still works, and its log shows no `feature off` lines.

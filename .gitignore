@@ -3,3 +3,4 @@
 *.cache
 *.state
 /dist/
+/docs/nexus-*

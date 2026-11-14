@@ -10,6 +10,8 @@ struct CharState {
     int shield = 0;        // ShieldMode: the character's shields (wherever worn), the rest of a weapon slot apart
     bool underwear = false; // the body's Underwear part hidden
     int headgear = -1;      // HeadMode, or -1: the game's own setting
+    int pack = 0;           // PackMode: mobility packs on the backpack slot (the rocket pack); the slot's entry in
+                            // `hidden` covers the other packs (utility packs)
 };
 
 void load_state();
@@ -28,5 +30,11 @@ enum ShieldMode : int { kShieldShown = 0, kShieldHidden = 1, kShieldInHand = 2, 
 const char* shield_mode_text(int mode);
 int state_shield(U16 ch);
 void state_set_shield(U16 ch, int mode);
+// Mobility packs (a backpack slot piece the character moves with: Oongka's rocket pack): shown, hidden, or shown only
+// while in use (out of its stowed state: flying).
+enum PackMode : int { kPackShown = 0, kPackHidden = 1, kPackInUse = 2, kPackModeCount = 3 };
+const char* pack_mode_text(int mode);
+int state_pack(U16 ch);
+void state_set_pack(U16 ch, int mode);
 
 } // namespace ghw
